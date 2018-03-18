@@ -4,13 +4,16 @@
 
     use Abraham\TwitterOAuth\TwitterOAuth;
 
+    /** @var TwitterOAuth $connection Twitterへの接続 */
     $connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET);
 
     //ここから先のツイートは削除されます
     $connection->post("statuses/update", array("status" => "起動"));
+    /** @var string $criteria これ以降のツイートを削除する基準点 */
     $criteria = get_last_tweet_ids($connection, 1)[0];
 
     while (true) {
+        /** @var array $last_tweet_ids 基準点以降にツイートされた10個以下のツイートID */
         $last_tweet_ids = get_last_tweet_ids($connection, 10, $criteria);
         foreach ($last_tweet_ids as $last_tweet_id) {
             $connection->post("statuses/destroy", array("id" => $last_tweet_id));
@@ -34,6 +37,7 @@
             $array["since_id"] = $since_id;
         }
 
+        /** @var stdClass[] $contents Twitterから帰ってきたレスポンス */
         $contents = $connection->get("statuses/user_timeline", $array);
 
         $results = array();
